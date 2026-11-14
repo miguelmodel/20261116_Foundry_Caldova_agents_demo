@@ -94,7 +94,14 @@ svg.icon {
 .intro-subtitle { color: var(--muted); font-size: 12px; }
 .mode-control { flex-shrink: 0; }
 .mode-label { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 9px; color: var(--muted); font-size: 9px; font-weight: 600; letter-spacing: 1.2px; }
-.info-dot { width: 14px; height: 14px; border: 1px solid #989da7; border-radius: 50%; text-align: center; font-size: 10px; line-height: 12px; letter-spacing: 0; }
+.info-tip { position: relative; display: inline-flex; }
+.info-dot { width: 16px; height: 16px; padding: 0; border: 1px solid #989da7; border-radius: 50%; color: var(--muted); background: transparent; font-size: 10px; font-weight: 600; line-height: 14px; letter-spacing: 0; text-align: center; cursor: help; transition: color .15s, border-color .15s, background .15s; }
+.info-dot:hover, .info-tip:focus-within .info-dot { color: #fff; border-color: transparent; background: var(--brand-gradient); }
+.tip-bubble { position: absolute; z-index: 20; top: calc(100% + 10px); right: -8px; display: grid; gap: 10px; width: 310px; padding: 14px 16px; border: 1px solid #dfe0ea; border-radius: 16px; color: var(--ink); background: #fff; box-shadow: 0 12px 32px #2a41661f; font-size: 12px; font-weight: 400; line-height: 1.5; letter-spacing: 0; text-align: left; white-space: normal; opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-4px); transition: opacity .15s, transform .15s, visibility 0s .15s; }
+.tip-bubble::before { content: ""; position: absolute; top: -6px; right: 12px; width: 10px; height: 10px; border-top: 1px solid #dfe0ea; border-left: 1px solid #dfe0ea; background: #fff; transform: rotate(45deg); }
+.tip-row { display: block; color: var(--muted); }
+.tip-row b { display: block; margin-bottom: 2px; color: #204f9d; font-weight: 600; }
+.info-tip:hover .tip-bubble, .info-tip:focus-within .tip-bubble { opacity: 1; visibility: visible; transform: none; transition: opacity .15s, transform .15s; }
 .segmented { display: flex; gap: 3px; border: 1px solid #d7d9e1; border-radius: 30px; padding: 4px; background: #e3e4e9; }
 .segmented button { border: 1px solid transparent; border-radius: 24px; padding: 9px 15px; color: #525463; background: transparent; font-size: 11px; white-space: nowrap; transition: background .2s, color .2s, box-shadow .2s; }
 .segmented button.selected { color: #204f9d; background: #fff; border-color: #dce1f0; box-shadow: 0 2px 6px #2a41660b; font-weight: 600; }
@@ -519,6 +526,8 @@ body:has([data-mode="orchestrated"].selected) .edge-track > span::after { conten
   .intro { flex-direction: column; align-items: flex-start; gap: 20px; }
   .intro h1 { font-size: 42px; }
   .mode-label { justify-content: flex-start; }
+  .tip-bubble { right: auto; left: -8px; }
+  .tip-bubble::before { right: auto; left: 12px; }
   .workspace { grid-template-columns: 246px minmax(0, 1fr); gap: 20px; }
   .timeline-panel { grid-column: 1 / -1; height: 430px; }
   .timeline-header { padding-top: 18px; padding-bottom: 16px; }
