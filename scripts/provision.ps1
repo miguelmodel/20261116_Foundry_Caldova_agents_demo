@@ -5,7 +5,10 @@ param(
     [string]$ResourceGroup = 'rg-caldova-foundry-demo',
     [string]$Location = 'eastus2',
     [switch]$DeployClaude = $true,
-    [switch]$NoClaude
+    [switch]$NoClaude,
+    # Model capacity in thousands of tokens per minute. Lower these if your subscription has less quota.
+    [ValidateRange(1, 100000)][int]$CoordinatorCapacity = 900,
+    [ValidateRange(1, 100000)][int]$AnalystCapacity = 200
 )
 
 $ErrorActionPreference = 'Stop'
@@ -51,6 +54,8 @@ try {
             principalId = @{ value = $principalId }
             location = @{ value = $Location }
             deployClaude = @{ value = $claudeRequested }
+            coordinatorCapacity = @{ value = $CoordinatorCapacity }
+            miniCapacity = @{ value = $AnalystCapacity }
             tags = @{ value = $tags }
         }
     }

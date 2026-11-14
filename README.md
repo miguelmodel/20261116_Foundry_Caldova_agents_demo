@@ -73,7 +73,8 @@ start.ps1                 Starts the local app
 ## Prerequisites
 
 - Windows with PowerShell 7, Python 3.13+ (tested with 3.14), [uv](https://docs.astral.sh/uv/), and Azure CLI 2.80+.
-- An Azure subscription in which you can create resources and role assignments, with quota for **GPT-5.5** and **GPT-5.4-mini** in a region that supports Foundry hosted agents (the default is East US 2).
+- An Azure subscription where you are **Owner** (or **Contributor** plus **User Access Administrator**), because the deployment creates role assignments.
+- Model quota in a region that supports Foundry hosted agents (the default is **East US 2**). The default deployment uses **GPT-5.5 Global Standard: 900K tokens per minute** and **GPT-5.4-mini Global Standard: 200K tokens per minute**. Check your quota on the Foundry portal's quota page, or run `az cognitiveservices usage list --location eastus2 --query "[?contains(name.value,'gpt-5')]" -o table`. If you have less, pass smaller values; see [Deployment options](#deployment-options).
 - **No Docker needed:** the hosted agent's image is built in the cloud with ACR Tasks.
 
 **About Claude:** partner models such as Claude are purchased through Azure Marketplace, and some subscriptions can't buy them. Deployment then retries automatically without Claude, and the Analyst uses GPT-5.4-mini. Pass `-NoClaude` to skip the attempt.
@@ -89,12 +90,12 @@ cd 20261116_Foundry_Caldova_agents_demo
 uv venv --python 3.14 .venv
 uv pip install --python .venv\Scripts\python.exe -r requirements.txt --prerelease=allow
 
-# 2. Sign in and pick a subscription
+# 2. Sign in and choose the subscription to deploy into
 az login
 az account set --subscription <your-subscription-id>
 
 # 3. Deploy everything (about 15–20 min) and run the smoke test
-.\scripts\deploy_all.ps1            # or: .\scripts\deploy_all.ps1 -NoClaude
+.\scripts\deploy_all.ps1 -NoClaude   # -NoClaude: Analyst on GPT-5.4-mini (drop it to try Claude)
 
 # 4. Start the app
 .\start.ps1                          # opens http://127.0.0.1:8000
@@ -113,13 +114,36 @@ The app runs until you press **Ctrl+C** or close that terminal; run `.\start.ps1
 
 More detail is in [`scripts/README.md`](scripts/README.md) and [`app/README.md`](app/README.md).
 
+### Deployment options
+
+`deploy_all.ps1` (and `provision.ps1`) accept these optional parameters:
+
+| Parameter | Default | Purpose |
+|---|---|---|
+| `-SubscriptionId` | the subscription in `.env`, else the active Azure CLI subscription | Where to deploy. |
+| `-ResourceGroup` | `rg-caldova-foundry-demo` | Created if it doesn't exist. Use a new name for a second copy. |
+| `-Location` | `eastus2` | Must support Foundry hosted agents and both models. |
+| `-NoClaude` | off | Skip the Claude attempt and use GPT-5.4-mini for the Analyst. |
+| `-CoordinatorCapacity` | `900` | GPT-5.5 capacity, in thousands of tokens per minute. |
+| `-AnalystCapacity` | `200` | GPT-5.4-mini capacity (Analyst and evaluation judge), in thousands of tokens per minute. |
+
+For example, for a subscription with less quota:
+
+```powershell
+.\scripts\deploy_all.ps1 -SubscriptionId <your-subscription-id> -NoClaude -CoordinatorCapacity 300 -AnalystCapacity 100
+```
+
+Lower capacity works, but long multi-agent runs are more likely to hit rate limits (HTTP 429). If that happens, wait a minute and run again.
+
+Your subscription ID, resource names and agent versions are written only to your local, git-ignored `.env`; nothing is committed.
+
 ## Configuration
 
 All settings live in a local **`.env`** file, which the deployment scripts create. It is **git-ignored**; see [`.env.example`](.env.example) for the keys.
 
 Optional settings:
 - **`AZURE_CONFIG_DIR`**: points the scripts and the app at a dedicated Azure CLI profile. This is useful if you switch between several subscriptions or tenants. Sign in to that profile once with `$env:AZURE_CONFIG_DIR="$env:LOCALAPPDATA\caldova-demo-azure"; az login` (use the same folder as in `.env`).
-- **`infra/tags.local.json`** (git-ignored): extra tags merged into every resource, if your organization requires them.
+- **`infra/tags.local.json`** (git-ignored): extra tags merged into every resource, if your organization requires them. It's a flat JSON object of tag names and values, for example `{ "owner": "my-team" }`.
 
 ## Observability
 

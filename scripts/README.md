@@ -63,6 +63,10 @@ fallback explicitly (recommended on internal or sandbox subscriptions, where Azu
 Marketplace blocks partner-model purchases). Otherwise Claude is requested, and a
 failed foundation deployment is retried once without it.
 
+`-CoordinatorCapacity` (default `900`) and `-AnalystCapacity` (default `200`) set the
+GPT-5.5 and GPT-5.4-mini deployment capacity in thousands of tokens per minute. Lower
+them if the subscription has less quota in the target region.
+
 If `.env` sets `AZURE_CONFIG_DIR`, every script uses that dedicated Azure CLI profile.
 Live scripts also refuse to run if the active CLI subscription or tenant differs
 from `.env`.

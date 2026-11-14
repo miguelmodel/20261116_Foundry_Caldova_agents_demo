@@ -41,6 +41,7 @@ function az {
             if ($parameters.parameters.tags.value.project -ne 'caldova-control-tower') {
                 throw 'Deployment did not receive merged tags.'
             }
+            $state.Capacities = "$($parameters.parameters.coordinatorCapacity.value)/$($parameters.parameters.miniCapacity.value)"
             if ($state.FailClaude -and $parameters.parameters.deployClaude.value) {
                 $global:LASTEXITCODE = 1
                 return
@@ -78,6 +79,7 @@ try {
     if ($global:CaldovaProvisionTestState.Deployments -ne 1 -or $envText -notmatch "ANALYST_MODEL_PROVIDER='anthropic'") {
         throw 'Default Claude provisioning test failed.'
     }
+    if ($global:CaldovaProvisionTestState.Capacities -ne '900/200') { throw 'Default model capacities were not passed to Bicep.' }
     $global:CaldovaProvisionTestState.Deployments = 0
     $global:CaldovaProvisionTestState.FailClaude = $true
     & $provision *> $null
@@ -86,8 +88,9 @@ try {
         throw 'Claude fallback provisioning test failed.'
     }
     $global:CaldovaProvisionTestState.Deployments = 0
-    & $provision -NoClaude *> $null
+    & $provision -NoClaude -CoordinatorCapacity 300 -AnalystCapacity 100 *> $null
     if ($global:CaldovaProvisionTestState.Deployments -ne 1) { throw 'Explicit -NoClaude test failed.' }
+    if ($global:CaldovaProvisionTestState.Capacities -ne '300/100') { throw 'Custom model capacities were not passed to Bicep.' }
 
     $global:CaldovaProvisionTestState.Disabled = $true
     $global:CaldovaProvisionTestState.Writes = 0
@@ -96,7 +99,7 @@ try {
     if (-not $rejected -or $global:CaldovaProvisionTestState.Writes -ne 0) {
         throw 'Disabled subscription did not stop all provisioning writes.'
     }
-    Write-Host 'PASS: mocked provisioning (Claude, automatic fallback, -NoClaude, disabled guard); no Azure calls.'
+    Write-Host 'PASS: mocked provisioning (Claude, automatic fallback, -NoClaude, model capacities, disabled guard); no Azure calls.'
 } finally {
     Remove-Item -LiteralPath $fixture -Recurse -Force
     Remove-Variable -Name CaldovaProvisionTestState -Scope Global
