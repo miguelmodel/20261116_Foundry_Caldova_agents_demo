@@ -1,0 +1,64 @@
+[
+  {
+    "shipment_id": "SH-2041", "sku": "CV-LIN-0042", "supplier_id": "ATLAS",
+    "quantity_units": 12000, "unit_cost_eur": 15.50, "po_value_eur": 186000.00,
+    "lane": "chittagong_valencia", "destination_dc": "DC-GUA", "mode": "sea",
+    "original_dc_arrival": "2026-11-10", "revised_dc_arrival": "2026-11-19", "delay_days": 9,
+    "status": "delayed", "current_location": "Chittagong bonded origin holding; sea loading planned 2026-11-03",
+    "cause": "Factory power outages (6 days) plus port congestion (3 days)",
+    "air_diversion_available": true, "split_decision_deadline": "2026-11-03",
+    "delay_awareness_utc": "2026-10-25T09:00:00+00:00", "supplier_notification_utc": "2026-10-26T09:00:00+00:00",
+    "force_majeure_approved": false
+  },
+  {
+    "shipment_id": "SH-2043", "sku": "CV-DEN-0203", "supplier_id": "HARBOR",
+    "quantity_units": 8000, "unit_cost_eur": 22.00, "po_value_eur": 176000.00,
+    "lane": "ningbo_valencia", "destination_dc": "DC-GUA", "mode": "sea",
+    "original_dc_arrival": "2026-11-11", "revised_dc_arrival": "2026-11-17", "delay_days": 6,
+    "status": "delayed", "current_location": "Ningbo bonded origin holding; recovered sailing slot pending",
+    "cause": "Port congestion at Ningbo", "air_diversion_available": true, "split_decision_deadline": "2026-11-03",
+    "force_majeure_approved": false
+  },
+  {
+    "shipment_id": "SH-2047", "sku": "CV-COT-0088", "supplier_id": "JADE",
+    "quantity_units": 10000, "unit_cost_eur": 7.80, "po_value_eur": 78000.00,
+    "lane": "ningbo_valencia", "destination_dc": "DC-LYS", "mode": "sea",
+    "original_dc_arrival": "2026-11-10", "revised_dc_arrival": "2026-11-18", "delay_days": 8,
+    "status": "delayed", "current_location": "Ningbo bonded origin holding; recovered sailing slot pending",
+    "cause": "Port congestion at Ningbo", "air_diversion_available": true, "split_decision_deadline": "2026-11-03",
+    "force_majeure_approved": false
+  },
+  {
+    "shipment_id": "SH-2045", "sku": "CV-SAT-0117", "supplier_id": "JADE",
+    "quantity_units": 6000, "unit_cost_eur": 18.00, "po_value_eur": 108000.00,
+    "lane": "ningbo_valencia", "destination_dc": "DC-GUA", "mode": "sea",
+    "original_dc_arrival": "2026-11-18", "revised_dc_arrival": "2026-11-18", "delay_days": 0,
+    "status": "on_time", "current_location": "Quality-released origin holding in Ningbo; unaffected booked departure 2026-11-04",
+    "cause": "No delay; demand risk from viral social-media trend",
+    "air_diversion_available": true, "split_decision_deadline": "2026-11-03", "force_majeure_approved": false
+  },
+  {
+    "shipment_id": "SH-2038", "sku": "CV-LIN-0042", "supplier_id": "ATLAS",
+    "quantity_units": 3000, "unit_cost_eur": 15.50, "po_value_eur": 46500.00,
+    "lane": "chittagong_valencia", "destination_dc": "DC-GUA", "mode": "sea",
+    "original_dc_arrival": "2026-11-01", "revised_dc_arrival": "2026-11-01", "delay_days": 0,
+    "status": "delivered", "current_location": "Delivered and included in opening inventory",
+    "cause": null, "air_diversion_available": false, "force_majeure_approved": false
+  },
+  {
+    "shipment_id": "SH-2040", "sku": "CV-DEN-0203", "supplier_id": "HARBOR",
+    "quantity_units": 2000, "unit_cost_eur": 22.00, "po_value_eur": 44000.00,
+    "lane": "ningbo_valencia", "destination_dc": "DC-LYS", "mode": "sea",
+    "original_dc_arrival": "2026-11-02", "revised_dc_arrival": "2026-11-02", "delay_days": 0,
+    "status": "delivered", "current_location": "Delivered and included in opening inventory",
+    "cause": null, "air_diversion_available": false, "force_majeure_approved": false
+  },
+  {
+    "shipment_id": "SH-2050", "sku": "CV-COT-0088", "supplier_id": "JADE",
+    "quantity_units": 7000, "unit_cost_eur": 7.80, "po_value_eur": 54600.00,
+    "lane": "ningbo_valencia", "destination_dc": "DC-GUA", "mode": "sea",
+    "original_dc_arrival": "2026-12-01", "revised_dc_arrival": "2026-12-01", "delay_days": 0,
+    "status": "on_time", "current_location": "Confirmed future production slot",
+    "cause": null, "air_diversion_available": false, "force_majeure_approved": false
+  }
+]

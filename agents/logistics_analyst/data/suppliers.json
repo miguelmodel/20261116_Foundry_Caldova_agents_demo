@@ -1,0 +1,38 @@
+{
+  "ATLAS": {
+    "name": "Atlas Textiles Ltd",
+    "city": "Dhaka",
+    "country": "Bangladesh",
+    "approved_unit_prices_eur": {"CV-LIN-0042": 15.50},
+    "contingency_supplier": false,
+    "late_delivery_terms": {"grace_days": 3, "daily_po_fraction": 0.015, "cap_po_fraction": 0.15, "notification_due_hours": 48, "partial_diversion_preserves_full_po_claim": true}
+  },
+  "BOREAL": {
+    "name": "Boreal Knitwear",
+    "city": "Porto",
+    "country": "Portugal",
+    "contingency_supplier": true,
+    "lead_days_to_dc_including_road": 6,
+    "minimum_order_units": 500,
+    "goods_price_premium_fraction": 0.18,
+    "approved_unit_prices_eur": {"CV-LIN-0042": 18.29, "CV-SAT-0117": 21.24},
+    "available_capacity_units": {"CV-LIN-0042": 5000, "CV-SAT-0117": 2500},
+    "capacity_note": "Independent, one-time per-SKU allocations; human reconfirmation required."
+  },
+  "JADE": {
+    "name": "Jade Weave Manufacturing",
+    "city": "Ningbo",
+    "country": "China",
+    "contingency_supplier": false,
+    "approved_unit_prices_eur": {"CV-SAT-0117": 18.00, "CV-COT-0088": 7.80},
+    "late_delivery_terms": null
+  },
+  "HARBOR": {
+    "name": "Harbor Denim Co",
+    "city": "Ningbo",
+    "country": "China",
+    "contingency_supplier": false,
+    "approved_unit_prices_eur": {"CV-DEN-0203": 22.00},
+    "late_delivery_terms": null
+  }
+}

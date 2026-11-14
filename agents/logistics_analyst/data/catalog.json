@@ -1,0 +1,27 @@
+{
+  "fictitious_demo_data": true,
+  "as_of_date": "2026-11-03",
+  "launch_date": "2026-11-17",
+  "launch_name": "EU Spring launch (fictional campaign name)",
+  "currency": "EUR",
+  "forecast_end_date": "2026-12-02",
+  "products": {
+    "CV-LIN-0042": {"name": "Linen Relaxed Shirt", "reference_unit_cost_eur": 15.50},
+    "CV-SAT-0117": {"name": "Satin Midi Skirt", "reference_unit_cost_eur": 18.00},
+    "CV-DEN-0203": {"name": "Straight Fit Jeans", "reference_unit_cost_eur": 22.00},
+    "CV-COT-0088": {"name": "Cotton Crewneck Tee", "reference_unit_cost_eur": 7.80}
+  },
+  "locations": {
+    "DC-GUA": {"name": "DC Guadalajara", "type": "dc", "role": "Main EU hub"},
+    "DC-LYS": {"name": "DC Lyon", "type": "dc", "role": "France and Italy hub"},
+    "ES-MAD-GV": {"name": "Madrid Gran Vía", "type": "flagship"},
+    "ES-BCN-PG": {"name": "Barcelona Passeig de Gràcia", "type": "flagship"},
+    "FR-PAR-RI": {"name": "Paris Rivoli", "type": "flagship"},
+    "IT-MIL-CV": {"name": "Milan Corso Vittorio Emanuele", "type": "flagship"},
+    "ES-MAD-PL": {"name": "Madrid Plenilunio", "type": "regular"},
+    "ES-BCN-DI": {"name": "Barcelona Diagonal", "type": "regular"},
+    "FR-PAR-BE": {"name": "Paris Belleville", "type": "regular"},
+    "IT-MIL-BI": {"name": "Milan Bicocca", "type": "regular"}
+  },
+  "regular_store_min_cover_days_at_dispatch": 7
+}

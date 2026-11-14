@@ -1,0 +1,31 @@
+# Internal / private material (never commit)
+internal_project_documents/
+inspiration/
+.github/copilot-instructions.md
+*.local.json
+*.local.*
+uv.toml
+
+# Environment & secrets
+.env*
+!.env.example
+.azure/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Generated / runtime
+.deploy/
+*.log
+.playwright-mcp/
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

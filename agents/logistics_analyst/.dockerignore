@@ -1,0 +1,7 @@
+*
+!Dockerfile
+!requirements.txt
+!main.py
+!erp_tools.py
+!data/
+!data/*.json

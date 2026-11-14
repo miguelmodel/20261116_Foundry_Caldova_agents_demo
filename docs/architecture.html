@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caldova Control Tower — Solution architecture</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --ink: #1b1b1b; --muted: #616161; --line: #8a8fa2;
+    --azure: #0475d3; --azure-bg: #f5f5f5; --foundry: #7958c8; --foundry-bg: #eeedf4;
+    --project-bg: #fafafa; --laptop: #2a4166; --laptop-bg: #f5f5f5;
+    --indigo: #2a54ca; --violet: #b03dc4; --teal: #287c83; --hairline: #e0e0e0;
+    --brand-text: linear-gradient(100deg, #0475d3 0%, #2a54ca 48%, #b03dc4 100%);
+    --brand-band: linear-gradient(115deg, #2e6cce, #5d5ec8 36%, #7958c8 66%, #b941c5);
+    --page: linear-gradient(130deg, #e6e6e5 0%, #ececec 55%, #f0dad4 100%);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif; color: var(--ink); background: var(--page); }
+  header { max-width: 1520px; margin: 0 auto; padding: 32px 40px 12px; }
+  header h1 { display: inline-block; margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -.5px; background: var(--brand-text); background-clip: text; -webkit-text-fill-color: transparent; }
+  header p { margin: 9px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+  .stage { padding: 12px 24px 8px; }
+  .fit { position: relative; margin: 0 auto; }
+  .canvas { position: absolute; top: 0; left: 0; width: 1440px; height: 860px; transform-origin: 0 0; background: var(--page); border-radius: 26px; }
+
+  .zone { position: absolute; border-radius: 26px; }
+  .zone > .zlabel { position: absolute; top: -13px; left: 22px; padding: 4px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600; letter-spacing: .35px; text-transform: uppercase; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .zone > .zlabel svg { width: 16px; height: 16px; }
+  .laptop { left: 30px; top: 80px; width: 310px; height: 560px; background: var(--laptop-bg); border: 1px dashed #9ca6b7; }
+  .laptop > .zlabel { background: var(--laptop); color: #fff; }
+  .azure { left: 400px; top: 30px; width: 1030px; height: 800px; background: var(--azure-bg); border: 1px solid #d7d7dc; }
+  .azure > .zlabel { background: #eef1fb; color: var(--indigo); border: 1px solid #dce1f0; }
+  .account { left: 430px; top: 88px; width: 710px; height: 592px; background: var(--foundry-bg); border: 1px solid #dcd9e5; }
+  .account > .zlabel { background: var(--brand-band); color: #fff; }
+  .project { left: 450px; top: 135px; width: 670px; height: 415px; background: var(--project-bg); border: 1px solid var(--hairline); border-radius: 22px; }
+  .project > .zlabel { background: #f3eaf9; color: #7950ab; top: -12px; }
+
+  .card { position: absolute; z-index: 2; background: #fff; border: 1px solid var(--hairline); border-radius: 18px; box-shadow: 0 4px 12px rgba(42, 65, 102, .065); padding: 12px; display: flex; gap: 10px; }
+  .card > div:last-child { min-width: 0; }
+  .card .ic { flex: 0 0 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; }
+  .card .ic svg { width: 21px; height: 21px; }
+  .card .t { font-weight: 600; font-size: 14.5px; line-height: 1.25; }
+  .card .s { color: var(--muted); font-size: 12.5px; line-height: 1.4; margin-top: 3px; }
+  .card ul { margin: 6px 0 0; padding-left: 16px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+  .kind { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; margin-bottom: 5px; }
+  .agent .kind { background: #eef1fb; color: var(--indigo); }
+  .agent.hosted .kind { background: #f3eaf9; color: #8a379c; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { font-size: 11.5px; padding: 3px 9px; border-radius: 999px; border: 1px solid #e0e1e9; background: #f5f5f5; color: var(--laptop); white-space: nowrap; }
+  .chip.model { background: #eef1fb; border-color: #dce1f0; color: var(--indigo); font-weight: 600; }
+  .chip.opt { border-style: dashed; color: var(--muted); }
+
+  .agent { border: 2px solid transparent; background: linear-gradient(#fff, #fff) padding-box, var(--brand-band) border-box; box-shadow: 0 6px 18px rgba(93, 94, 200, .12); }
+  .card.agent .ic { color: #fff; background: var(--brand-band); }
+  .tool { border-top: 3px solid #63a1a7; padding: 10px 12px; gap: 8px; }
+  .tool .ic { flex-basis: 28px; height: 28px; }
+  .tool .ic svg { width: 19px; height: 19px; }
+  .tool .s { font-size: 12px; line-height: 1.35; }
+
+  .ic.slate { background: #eef1f6; color: var(--laptop); }
+  .ic.violet { background: #eef1fb; color: var(--indigo); }
+  .ic.pink { background: #f3eaf9; color: var(--violet); }
+  .ic.teal { background: #e9f3f3; color: var(--teal); }
+  .ic.blue { background: #eaf2fb; color: var(--azure); }
+  .ic.green { background: #e9f3f3; color: var(--teal); }
+  .ic.amber { background: #f3eaf9; color: var(--foundry); }
+
+  svg.wires { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; }
+  .wire { fill: none; stroke: var(--line); stroke-width: 2; }
+  .wire.main { stroke: var(--laptop); stroke-width: 2.4; }
+  .wire.a2a { stroke: url(#a2a-gradient); stroke-width: 3.5; }
+  .wire.dash { stroke-dasharray: 6 6; }
+  .wire.tele { stroke: var(--teal); stroke-dasharray: 5 5; }
+  .wlabel { font-size: 11.5px; fill: var(--laptop); font-weight: 600; paint-order: stroke; stroke: #fafafa; stroke-width: 4px; stroke-linejoin: round; }
+  .wlabel.soft { fill: var(--muted); font-weight: 500; font-style: italic; }
+  .wlabel.a2a { fill: #7950ab; font-weight: 700; }
+  .wlabel.tele { fill: var(--teal); }
+
+  .num { position: absolute; z-index: 3; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; background: var(--brand-band); color: #fff; font-size: 12.5px; font-weight: 700; display: grid; place-items: center; box-shadow: 0 0 0 3px #fff; }
+  .num.a2a { background: linear-gradient(115deg, #7958c8, #b941c5); }
+  .num.tele { background: linear-gradient(115deg, #287c83, #466c8b); }
+
+  .legend { max-width: 1440px; margin: 6px auto 34px; padding: 0 24px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 22px; }
+  .panel { background: #fff; border: 1px solid var(--hairline); border-radius: 22px; padding: 20px 24px; box-shadow: 0 4px 14px rgba(42, 65, 102, .045); }
+  .panel h2 { color: var(--indigo); font-size: 15px; font-weight: 600; margin: 0 0 10px; letter-spacing: .2px; }
+  .panel ol, .panel ul { margin: 0; padding-left: 0; list-style: none; }
+  .panel li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.5; padding: 5px 0; color: var(--muted); }
+  .panel li .num { position: static; margin: 1px 0 0; flex: 0 0 22px; width: 22px; height: 22px; font-size: 11.5px; box-shadow: none; }
+  .panel li b { color: var(--ink); }
+  .key { display: inline-block; width: 30px; height: 0; border-top: 3px solid var(--laptop); margin: 9px 0 0; flex: 0 0 30px; }
+  .key.a2a { border: 0; height: 3.5px; background: var(--brand-text); border-radius: 999px; }
+  .key.dash { border-top: 3px dashed var(--line); }
+  .key.tele { border-top: 3px dashed var(--teal); }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 0 0 26px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="a2a-gradient" gradientUnits="userSpaceOnUse" x1="734" y1="280" x2="834" y2="280">
+      <stop offset="0" stop-color="#0475d3"/><stop offset=".48" stop-color="#2a54ca"/><stop offset="1" stop-color="#b03dc4"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2a4166"/></marker>
+    <marker id="arrow-a2a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b03dc4"/></marker>
+    <marker id="arrow-soft" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8a8fa2"/></marker>
+    <marker id="arrow-tele" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#287c83"/></marker>
+  </defs>
+  <symbol id="i-laptop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></symbol>
+  <symbol id="i-browser" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/><path d="M7 14l3-2 3 3 4-4"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01M8 17.5h.01M12 10v4"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.5 4.3 4.3 0 0 0 7 18z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></symbol>
+  <symbol id="i-agent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9.5 13h.01M14.5 13h.01M9.5 16.2h5M3 12v3M21 12v3"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3l5 5h-5z"/><circle cx="16.5" cy="16.5" r="3"/><path d="M18.7 18.7L21 21"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+  <symbol id="i-stack" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5" opacity=".5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v6c0 4.5-3.2 7.8-7.5 9-4.3-1.2-7.5-4.5-7.5-9V6z"/><circle cx="12" cy="11" r="2.2"/><path d="M12 13.2V16"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4M4 20h16"/><path d="M7 15l4-4 3 3 5-6"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-13M4.5 12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8"/></symbol>
+  <symbol id="i-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></symbol>
+</svg>
+
+<header>
+  <h1>Caldova Control Tower — solution architecture</h1>
+  <p>Two Microsoft Foundry agents (a prompt agent and a hosted LangGraph agent) collaborate over A2A. A local app drives them and shows every step, and every run is traced end to end.</p>
+</header>
+
+<div class="stage">
+  <div class="fit" id="fit">
+    <div class="canvas" id="canvas">
+
+      <div class="zone laptop"><div class="zlabel"><svg><use href="#i-laptop"/></svg>Your laptop · local, no Docker</div></div>
+      <div class="zone azure"><div class="zlabel"><svg><use href="#i-cloud"/></svg>Azure · resource group</div></div>
+      <div class="zone account"><div class="zlabel"><svg><use href="#i-spark"/></svg>Microsoft Foundry resource</div></div>
+      <div class="zone project"><div class="zlabel">Foundry project · Caldova Control Tower</div></div>
+
+      <svg class="wires" width="1440" height="860" viewBox="0 0 1440 860">
+        <path class="wire main" d="M185 254 L185 346" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+        <text class="wlabel" x="205" y="296">POST /api/run</text>
+        <text class="wlabel soft" x="205" y="312">live SSE events</text>
+
+        <path class="wire main" d="M310 425 C 400 425, 392 280, 474 280" marker-end="url(#arrow)"/>
+        <text class="wlabel" x="322" y="468">Responses API</text>
+        <text class="wlabel soft" x="322" y="484">Entra ID token</text>
+
+        <path class="wire dash" d="M310 385 C 362 385, 362 172, 430 172 L 965 172 L 965 184" marker-end="url(#arrow-soft)"/>
+        <text class="wlabel soft" x="800" y="165">orchestrated mode (fallback)</text>
+
+        <path class="wire a2a" d="M734 280 L834 280" marker-end="url(#arrow-a2a)"/>
+        <text class="wlabel a2a" x="784" y="262" text-anchor="middle">A2A v1.0</text>
+        <text class="wlabel soft" x="784" y="306" text-anchor="middle">agent identity</text>
+
+        <path class="wire main" d="M965 374 L965 414" marker-end="url(#arrow)"/>
+        <text class="wlabel" x="985" y="399">MCP</text>
+
+        <path class="wire main" d="M605 374 L605 414" marker-end="url(#arrow)"/>
+        <text class="wlabel" x="625" y="399">policy check</text>
+
+        <path class="wire" d="M1180 158 C 1132 158, 1134 240, 1096 240" marker-end="url(#arrow-soft)"/>
+        <text class="wlabel soft" x="1104" y="212">image pull</text>
+
+        <path class="wire tele" d="M1142 480 L1174 480" marker-end="url(#arrow-tele)"/>
+        <text class="wlabel tele" x="1146" y="472" font-size="10">logs</text>
+
+        <path class="wire tele" d="M1142 637 L1174 637" marker-end="url(#arrow-tele)"/>
+
+        <path class="wire tele" d="M1295 574 L1295 536" marker-end="url(#arrow-tele)"/>
+        <text class="wlabel tele" x="1305" y="560">workspace-based</text>
+
+        <path class="wire tele" d="M185 534 L185 790 L1295 790 L1295 706" marker-end="url(#arrow-tele)"/>
+        <text class="wlabel tele" x="640" y="780">client spans · same trace ID as the Foundry spans</text>
+      </svg>
+
+      <div class="num" style="left:185px; top:300px">1</div>
+      <div class="num" style="left:398px; top:352px">2</div>
+      <div class="num a2a" style="left:784px; top:280px">3</div>
+      <div class="num" style="left:965px; top:394px">4</div>
+      <div class="num" style="left:605px; top:394px">5</div>
+      <div class="num tele" style="left:1158px; top:612px">6</div>
+      <div class="num tele" style="left:600px; top:790px">6</div>
+
+      <div class="card" style="left:60px; top:120px; width:250px; height:130px">
+        <div class="ic slate"><svg><use href="#i-browser"/></svg></div>
+        <div><div class="t">Control Tower UI</div><div class="s">Browser · HTML / CSS / JS, no build step</div>
+          <div class="chips"><span class="chip">Live agent flow</span><span class="chip">Trace ID</span></div></div>
+      </div>
+
+      <div class="card" style="left:60px; top:350px; width:250px; height:180px">
+        <div class="ic slate"><svg><use href="#i-server"/></svg></div>
+        <div><div class="t">Local backend</div><div class="s">Python · FastAPI · uvicorn</div>
+          <ul><li>Relays Foundry events (SSE)</li><li>OpenTelemetry tracing</li><li>Signs in with Azure CLI (Entra ID)</li></ul></div>
+      </div>
+
+      <div class="card agent" style="left:480px; top:190px; width:250px; height:180px">
+        <div class="ic violet"><svg><use href="#i-agent"/></svg></div>
+        <div><span class="kind">Prompt agent</span>
+          <div class="t">Caldova Coordinator</div>
+          <div class="s">Delegates the analysis, checks policies, writes the recommendation</div>
+          <div class="chips"><span class="chip model">GPT-5.5</span><span class="chip">A2A tool</span><span class="chip">File Search</span></div></div>
+      </div>
+
+      <div class="card agent hosted" style="left:840px; top:190px; width:250px; height:180px">
+        <div class="ic pink"><svg><use href="#i-box"/></svg></div>
+        <div><span class="kind">Hosted agent</span>
+          <div class="t">Caldova Logistics Analyst</div>
+          <div class="s">LangGraph container · ERP tools over synthetic data</div>
+          <div class="chips"><span class="chip model">GPT-5.4-mini</span><span class="chip">ERP tools</span><span class="chip">Web Search</span></div></div>
+      </div>
+
+      <div class="card tool" style="left:480px; top:420px; width:250px; height:105px">
+        <div class="ic teal"><svg><use href="#i-doc"/></svg></div>
+        <div><div class="t">File Search</div><div class="s">Vector store with the Caldova policy PDFs (playbook, approvals, contracts)</div></div>
+      </div>
+
+      <div class="card tool" style="left:840px; top:420px; width:250px; height:105px">
+        <div class="ic teal"><svg><use href="#i-globe"/></svg></div>
+        <div><div class="t">Foundry Toolbox</div><div class="s">MCP endpoint exposing Web Search to the hosted agent</div></div>
+      </div>
+
+      <div class="card" style="left:450px; top:572px; width:670px; height:88px; align-items:center">
+        <div class="ic violet"><svg><use href="#i-chip"/></svg></div>
+        <div><div class="t">Model deployments</div>
+          <div class="chips"><span class="chip model">GPT-5.5 · Coordinator</span><span class="chip model">GPT-5.4-mini · Analyst</span><span class="chip opt">Claude Opus 5.5 · optional, where Marketplace models are allowed</span></div></div>
+      </div>
+
+      <div class="card" style="left:1180px; top:100px; width:230px; height:115px">
+        <div class="ic blue"><svg><use href="#i-stack"/></svg></div>
+        <div><div class="t">Container Registry</div><div class="s">Analyst image, built in the cloud with ACR Tasks</div></div>
+      </div>
+
+      <div class="card" style="left:1180px; top:255px; width:230px; height:130px">
+        <div class="ic amber"><svg><use href="#i-shield"/></svg></div>
+        <div><div class="t">Microsoft Entra ID</div><div class="s">Keyless auth: user sign-in, project and agent identities, RBAC</div></div>
+      </div>
+
+      <div class="card" style="left:1180px; top:430px; width:230px; height:105px">
+        <div class="ic green"><svg><use href="#i-db"/></svg></div>
+        <div><div class="t">Log Analytics</div><div class="s">Trace storage and Foundry diagnostic logs</div></div>
+      </div>
+
+      <div class="card" style="left:1180px; top:575px; width:230px; height:130px">
+        <div class="ic green"><svg><use href="#i-chart"/></svg></div>
+        <div><div class="t">Application Insights</div><div class="s">Traces and evaluation scores, shown in Foundry on the Traces and Monitor tabs</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<section class="legend">
+  <div class="panel">
+    <h2>How a run flows (A2A native mode)</h2>
+    <ol>
+      <li><span class="num">1</span><span>The presenter picks a disruption in the <b>Control Tower UI</b>. The <b>local backend</b> streams every agent event back live.</span></li>
+      <li><span class="num">2</span><span>The backend calls the <b>Caldova Coordinator</b> through the Foundry Responses API, authenticated with Entra ID.</span></li>
+      <li><span class="num a2a">3</span><span>The Coordinator delegates to the <b>Caldova Logistics Analyst</b> over <b>A2A</b>, agent to agent, inside Foundry.</span></li>
+      <li><span class="num">4</span><span>The Analyst runs its LangGraph tools: ERP lookups, recovery-option math, and <b>Web Search</b> through the Foundry Toolbox (MCP).</span></li>
+      <li><span class="num">5</span><span>The Coordinator checks the Caldova policies with <b>File Search</b> and writes the final recommendation.</span></li>
+      <li><span class="num tele">6</span><span>Spans from the backend, the Foundry service and the hosted container land in <b>Application Insights</b> as a single trace. Foundry also scores the Coordinator's answers with <b>continuous evaluation</b>, shown on its Monitor tab.</span></li>
+    </ol>
+  </div>
+  <div class="panel">
+    <h2>Legend</h2>
+    <ul>
+      <li><span class="key"></span><span>Request flow</span></li>
+      <li><span class="key a2a"></span><span>Agent-to-agent (A2A) call between the two Foundry agents</span></li>
+      <li><span class="key dash"></span><span><b>Backend orchestrated</b> mode: the backend calls the Analyst directly, so its tool calls stream live in the UI</span></li>
+      <li><span class="key tele"></span><span>Telemetry and diagnostics</span></li>
+    </ul>
+    <h2 style="margin-top:16px">Good to know</h2>
+    <ul>
+      <li><span>•</span><span>Agents, models and tools use <b>keyless</b> Entra ID authentication; only telemetry uses the Application Insights connection string.</span></li>
+      <li><span>•</span><span>The app runs <b>locally</b>; only the agents, models and tools run in Azure.</span></li>
+      <li><span>•</span><span>Answer quality is graded by built-in Foundry evaluators, with <b>GPT-5.4-mini</b> as the judge.</span></li>
+      <li><span>•</span><span>All company data is <b>fictitious</b>.</span></li>
+    </ul>
+  </div>
+</section>
+
+<footer>Caldova is a fictitious company. This diagram shows general components only.</footer>
+
+<script>
+  const fit = document.getElementById("fit");
+  const canvas = document.getElementById("canvas");
+  function resize() {
+    const available = document.documentElement.clientWidth - 48;
+    const scale = Math.min(1, available / 1440);
+    canvas.style.transform = `scale(${scale})`;
+    fit.style.width = `${1440 * scale}px`;
+    fit.style.height = `${860 * scale}px`;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+</script>
+</body>
+</html>

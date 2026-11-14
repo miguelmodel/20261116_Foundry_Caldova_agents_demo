@@ -1,0 +1,11 @@
+{
+  "currency": "EUR",
+  "fictitious_demo_data": true,
+  "lanes": {
+    "chittagong_valencia": {"origin_port": "Chittagong", "destination_port": "Valencia", "sea_eur_per_unit": 1.20, "sea_lead_days_to_dc": 16, "air_eur_per_unit": 9.80, "air_lead_days_to_dc": 4, "air_capacity_units": 3000},
+    "ningbo_valencia": {"origin_port": "Ningbo", "destination_port": "Valencia", "sea_eur_per_unit": 1.10, "sea_lead_days_to_dc": 14, "air_eur_per_unit": 10.50, "air_lead_days_to_dc": 4, "air_capacity_units": 3000}
+  },
+  "road": {"eur_per_unit": 0.65, "dc_to_store_days": 1, "direct_reallocation_days": 1},
+  "unused_sea_freight_fully_creditable": true,
+  "cost_basis": "Additional cash over the committed original PO, sea and final-mile budgets. Backup goods and both road legs are additional. Penalties are separate."
+}

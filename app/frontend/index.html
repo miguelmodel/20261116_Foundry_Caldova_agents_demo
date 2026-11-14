@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ECECEC">
+  <meta name="description" content="Caldova Control Tower — real Microsoft Foundry agents, working together on supply-chain disruption response.">
+  <title>CALDOVA — Control Tower</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%232A4166'/%3E%3Cpath d='M28 12a11 11 0 1 0 0 16' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script type="module" src="/static/app.js"></script>
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6m0-6-10 10M10 5H5v14h14v-5"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4Z"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8Zm0 0v5h5M8 12h8m-8 4h6"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m9 15 6-6m-7 9-1 1a4.2 4.2 0 0 1-6-6l5-5a4.2 4.2 0 0 1 6 0m4-2 1-1a4.2 4.2 0 0 1 6 6l-5 5a4.2 4.2 0 0 1-6 0" transform="translate(1 0) scale(.9)"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5Zm-9 5v10l9 5 9-5V8M12 13v10M7 5.8l9 5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v13h5"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 4l-4 16"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2Zm0 6v5m0 3v.2"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Caldova Control Tower home"><svg class="wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 50" role="img" aria-label="Caldova"><g fill="none" stroke="#2A4166" stroke-width="7" stroke-linejoin="bevel"><path d="M36 12C32 8 28 7 23 7 12 7 6 15 6 25s6 18 17 18c5 0 9-1 13-5M47 43 63 7 79 43M94 7v36h25M134 7h12c24 0 24 36 0 36h-12ZM197 7c-24 0-24 36 0 36s24-36 0-36ZM227 7l16 36 16-36M272 43 288 7l16 36"/></g></svg><span class="brand-rule"></span><span class="brand-name">CONTROL TOWER<span>Disruption, orchestrated.</span></span></a>
+    <div class="header-actions">
+      <button id="connection" class="connection" title="Checking both agents" aria-label="Check Foundry connection"><span class="status-dot"></span><span id="connection-label">Connecting</span></button>
+      <a id="foundry-link" class="header-link" target="_blank" rel="noopener noreferrer">Foundry <svg class="icon"><use href="#i-external"/></svg></a>
+      <a id="insights-link" class="header-link" target="_blank" rel="noopener noreferrer">App Insights <svg class="icon"><use href="#i-external"/></svg></a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="intro">
+      <div><p class="eyebrow"><span class="tiny-line"></span> AGENTIC SUPPLY-CHAIN INTELLIGENCE</p><h1>From disruption. <em>To direction.</em></h1><p class="intro-subtitle">Two specialized agents. One coordinated response. Powered by Microsoft Foundry.</p></div>
+      <div class="mode-control"><span class="mode-label">ORCHESTRATION MODE <span class="info-dot" title="A2A: Foundry delegates natively. Backend: a three-phase fallback streams the analyst's tool activity.">i</span></span><div class="segmented" role="group" aria-label="Orchestration mode"><button class="selected" data-mode="a2a" aria-pressed="true"><span class="mini-dot"></span>A2A native</button><button data-mode="orchestrated" aria-pressed="false">Backend orchestrated</button></div></div>
+    </section>
+
+    <div class="workspace">
+      <aside class="scenario-column">
+        <div class="section-label"><span>01</span> THE DISRUPTION</div>
+        <h2>Choose a scenario.</h2><p class="muted small">A real-world signal. A starting point.</p>
+        <div id="scenarios" class="scenario-list" aria-label="Disruption scenarios"></div>
+        <label class="prompt-label" for="prompt">BRIEF THE CONTROL TOWER <span>or make it your own</span></label>
+        <textarea id="prompt" rows="6" maxlength="16000" placeholder="Describe a supply-chain disruption…" aria-describedby="prompt-help"></textarea>
+        <button id="run-button" class="run-button" disabled><svg class="icon"><use href="#i-spark"/></svg><span>Find a way forward</span><svg class="icon"><use href="#i-arrow"/></svg></button>
+        <p id="prompt-help" class="local-note"><span class="status-dot"></span> Real agents. Real tools. No simulated answers.</p>
+        <div class="scenario-footer"><span>CALDOVA / OPERATIONS INTELLIGENCE</span><span>2026</span></div>
+      </aside>
+
+      <section class="main-column">
+        <section class="flow-panel panel" aria-label="Live agent flow">
+          <div class="panel-top"><div class="section-label"><span>02</span> THE COLLABORATION</div><span id="flow-state" class="quiet-badge"><span class="status-dot"></span>Ready when you are</span></div>
+          <div class="flow-caption"><h2>Intelligence, in motion.</h2><span class="live-label"><span></span> LIVE AGENT FLOW</span></div>
+          <div id="flow-canvas" class="flow-canvas">
+            <div class="request-origin"><svg class="icon"><use href="#i-user"/></svg><span>Your disruption</span><svg class="icon"><use href="#i-arrow"/></svg></div>
+            <div class="flow-lane">
+              <article id="agent-coordinator" class="agent-card" data-status="idle">
+                <div class="agent-top"><span class="agent-avatar coordinator-avatar"><svg class="icon"><use href="#i-spark"/></svg></span><span class="agent-number">AGENT 01</span><span class="agent-status" id="status-coordinator">Standby</span></div>
+                <h3>Caldova Coordinator</h3><p class="agent-kind">Prompt agent</p>
+                <div class="model-line"><span class="model-symbol">◈</span><span id="coordinator-model">GPT-5.5</span><span class="model-tag">REASONING</span></div>
+                <div class="tool-chips"><span data-tool="file_search"><svg class="icon"><use href="#i-file"/></svg>File Search</span><span data-tool="a2a"><svg class="icon"><use href="#i-link"/></svg>A2A</span></div>
+                <div class="agent-bottom"><span class="status-dot"></span><span id="detail-coordinator">Policies → decisions</span></div>
+              </article>
+              <div id="handoff-edge" class="handoff-edge" aria-label="Agent collaboration connection"><span class="edge-route">DELEGATE</span><div class="edge-track"><i></i><i></i><span>A2A</span></div><span id="edge-label" class="edge-label">via A2A</span></div>
+              <article id="agent-analyst" class="agent-card" data-status="idle">
+                <div class="agent-top"><span class="agent-avatar analyst-avatar"><svg class="icon"><use href="#i-grid"/></svg></span><span class="agent-number">AGENT 02</span><span class="agent-status" id="status-analyst">Standby</span></div>
+                <h3>Logistics Analyst</h3><p class="agent-kind">Hosted agent · LangGraph</p>
+                <div class="model-line"><span class="model-symbol analyst-symbol">✳</span><span id="analyst-model">Claude Opus 5.5</span><span class="model-tag">ANALYSIS</span></div>
+                <div class="tool-chips"><span data-tool="function mcp"><svg class="icon"><use href="#i-box"/></svg>ERP tools</span><span data-tool="web_search"><svg class="icon"><use href="#i-globe"/></svg>Web Search</span></div>
+                <div class="agent-bottom"><span class="status-dot"></span><span id="detail-analyst">Signals → understanding</span></div>
+              </article>
+            </div>
+          </div>
+          <div class="flow-footnote"><svg class="icon"><use href="#i-link"/></svg><span id="mode-explainer">Foundry-native A2A · Coordinator delegates directly to the Analyst.</span><span class="flow-legend"><i></i> Awaiting a signal</span></div>
+        </section>
+
+        <section class="recommendation panel" aria-labelledby="recommendation-title">
+          <div class="panel-top"><div class="section-label"><span>03</span> THE WAY FORWARD</div><span id="recommendation-state" class="quiet-badge">Awaiting a brief</span></div>
+          <div class="recommendation-title"><h2 id="recommendation-title">A clear next move.</h2><button id="copy-recommendation" class="icon-button" title="Copy recommendation" aria-label="Copy recommendation" disabled><svg class="icon"><use href="#i-copy"/></svg></button></div>
+          <div id="run-error" class="error-banner" role="alert" hidden></div>
+          <div id="recommendation-empty" class="recommendation-empty"><span class="empty-spark"><svg class="icon"><use href="#i-spark"/></svg></span><h3>Clarity starts with a question.</h3><p>Choose a scenario and let the agents connect policy,<br>operational data, and the world outside.</p><div class="empty-steps"><span>Understand</span><i></i><span>Collaborate</span><i></i><span>Recommend</span></div></div>
+          <div id="recommendation-text" class="markdown recommendation-content" aria-live="polite" aria-busy="false" hidden></div>
+          <details id="analyst-report" class="analyst-report" hidden><summary><svg class="icon"><use href="#i-grid"/></svg>Logistics Analyst report<span>SUPPORTING INTELLIGENCE</span><svg class="icon"><use href="#i-chevron"/></svg></summary><div id="analyst-text" class="markdown"></div></details>
+          <div class="recommendation-footer"><span><span class="status-dot"></span> GROUNDED IN CALDOVA POLICIES & LIVE OPERATIONAL DATA</span><span id="answer-timing">Human judgment. Agent-powered.</span></div>
+        </section>
+      </section>
+
+      <aside class="timeline-panel panel" aria-labelledby="timeline-title">
+        <div class="timeline-header"><div><p class="eyebrow">TRANSPARENCY, BY DESIGN</p><h2 id="timeline-title">The live trail.</h2></div><span id="event-count" class="event-count">00</span></div>
+        <div class="timeline-toolbar"><span><span id="timeline-dot" class="status-dot"></span><span id="timeline-state">Waiting for your first run</span></span><span id="elapsed">00:00</span></div>
+        <div id="timeline" class="timeline" aria-live="polite"><div id="timeline-empty" class="timeline-empty"><div class="trail-illustration"><span></span><i></i><span></span><i></i><span></span></div><h3>Nothing behind the curtain.</h3><p>Every search, delegation, and decision<br>will leave a trace right here.</p><span class="timeline-empty-tag">FOLLOW THE THINKING</span></div></div>
+        <div class="timeline-footer"><svg class="icon"><use href="#i-clock"/></svg>Agent actions appear as they happen.<br><span>A2A reports return after delegation completes.</span></div>
+      </aside>
+    </div>
+
+    <section class="observability panel" aria-label="Run observability">
+      <div class="trace-heading"><svg class="icon"><use href="#i-code"/></svg><span>EVERY DECISION.<br><strong>A TRACEABLE STORY.</strong></span></div>
+      <div class="trace-field run-field"><span>RUN ID</span><code id="run-id">—</code></div>
+      <div class="trace-field trace-id-field"><span>TRACE ID</span><div><code id="trace-id">No run yet</code><button id="copy-trace" class="icon-button" title="Copy trace ID" aria-label="Copy trace ID" disabled><svg class="icon"><use href="#i-copy"/></svg></button></div></div>
+      <div class="trace-field duration-field"><span>DURATION / TOKENS</span><code id="run-metrics">— / —</code></div>
+      <div class="trace-actions"><a id="trace-link" class="trace-link" target="_blank" rel="noopener noreferrer">Open in Foundry <svg class="icon"><use href="#i-external"/></svg></a><button id="debug-toggle" class="debug-toggle" aria-expanded="false" aria-controls="debug-drawer"><svg class="icon"><use href="#i-code"/></svg>Raw events <span id="raw-count">0</span></button></div>
+      <div class="trace-hint"><span id="trace-hint">Agents → Traces → search trace/response ID (ingestion ~2–5 min)</span><span id="response-ids">Response IDs appear after a run.</span></div>
+    </section>
+    <section id="debug-drawer" class="debug-drawer" hidden><div class="debug-top"><span>FOUNDRY RESPONSES / RAW EVENT STREAM</span><button id="copy-debug" class="header-link">Copy JSON</button></div><pre id="debug-content">No raw events yet.</pre></section>
+    <footer class="page-footer"><span>DESIGNED FOR THE UNEXPECTED.</span><span>Local control tower <i>·</i> Microsoft Foundry <i>·</i> Synthetic Caldova scenario data</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>

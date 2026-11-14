@@ -1,0 +1,26 @@
+{
+  "CV-LIN-0042": {
+    "demand_multiplier": 1,
+    "reason": "Launch demand is already included; do not apply a second launch uplift.",
+    "baseline_daily_units": {"DC-GUA": 0, "DC-LYS": 0, "ES-MAD-GV": 120, "ES-BCN-PG": 90, "FR-PAR-RI": 100, "IT-MIL-CV": 80, "ES-MAD-PL": 30, "ES-BCN-DI": 25, "FR-PAR-BE": 20, "IT-MIL-BI": 20},
+    "dc_safety_stock_units": {"DC-GUA": 600, "DC-LYS": 300}
+  },
+  "CV-SAT-0117": {
+    "demand_multiplier": 4,
+    "reason": "Fictitious social-media trend increased demand by 300% (4x baseline) for the full forecast window.",
+    "baseline_daily_units": {"DC-GUA": 0, "DC-LYS": 0, "ES-MAD-GV": 28, "ES-BCN-PG": 22, "FR-PAR-RI": 25, "IT-MIL-CV": 20, "ES-MAD-PL": 12, "ES-BCN-DI": 10, "FR-PAR-BE": 9, "IT-MIL-BI": 9},
+    "dc_safety_stock_units": {"DC-GUA": 500, "DC-LYS": 250}
+  },
+  "CV-DEN-0203": {
+    "demand_multiplier": 1,
+    "reason": "Stable campaign demand; port congestion affects SH-2043.",
+    "baseline_daily_units": {"DC-GUA": 0, "DC-LYS": 0, "ES-MAD-GV": 70, "ES-BCN-PG": 55, "FR-PAR-RI": 60, "IT-MIL-CV": 50, "ES-MAD-PL": 22, "ES-BCN-DI": 18, "FR-PAR-BE": 16, "IT-MIL-BI": 15},
+    "dc_safety_stock_units": {"DC-GUA": 400, "DC-LYS": 200}
+  },
+  "CV-COT-0088": {
+    "demand_multiplier": 1,
+    "reason": "Stable campaign demand; port congestion affects SH-2047.",
+    "baseline_daily_units": {"DC-GUA": 0, "DC-LYS": 0, "ES-MAD-GV": 95, "ES-BCN-PG": 75, "FR-PAR-RI": 85, "IT-MIL-CV": 70, "ES-MAD-PL": 30, "ES-BCN-DI": 25, "FR-PAR-BE": 22, "IT-MIL-BI": 20},
+    "dc_safety_stock_units": {"DC-GUA": 500, "DC-LYS": 250}
+  }
+}
