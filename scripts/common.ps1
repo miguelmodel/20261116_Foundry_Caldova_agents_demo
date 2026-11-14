@@ -74,3 +74,59 @@ function Get-CaldovaTags {
     }
     return $tags
 }
+
+function Assert-CaldovaModelQuota {
+    # Fails fast, before anything is created, when the region lacks model quota for the requested capacity.
+    param(
+        [Parameter(Mandatory)][string]$SubscriptionId,
+        [Parameter(Mandatory)][string]$Location,
+        [Parameter(Mandatory)][string]$ResourceGroup,
+        [Parameter(Mandatory)][hashtable]$Required
+    )
+    try {
+        $usages = (Invoke-CaldovaAz -Arguments @(
+            'rest', '--method', 'get', '--url',
+            "https://management.azure.com/subscriptions/$SubscriptionId/providers/Microsoft.CognitiveServices/locations/$Location/usages?api-version=2024-10-01",
+            '--output', 'json'
+        ) | ConvertFrom-Json).value
+    } catch {
+        Write-Warning "Could not read model quota for $Location. Azure will still check quota during deployment."
+        return
+    }
+    # Capacity already held by this demo's deployments in the target resource group is reused, not new.
+    $existing = @{}
+    if ((Invoke-CaldovaAz -Arguments @('group', 'exists', '--name', $ResourceGroup)) -eq 'true') {
+        $accounts = Invoke-CaldovaAz -Arguments @(
+            'cognitiveservices', 'account', 'list', '--resource-group', $ResourceGroup, '--query', '[].name', '--output', 'tsv'
+        )
+        foreach ($account in @($accounts -split "`r?`n" | Where-Object { $_.Trim() })) {
+            $deployments = Invoke-CaldovaAz -Arguments @(
+                'cognitiveservices', 'account', 'deployment', 'list', '--resource-group', $ResourceGroup,
+                '--name', $account.Trim(), '--query', '[].{name:name,capacity:sku.capacity}', '--output', 'json'
+            ) | ConvertFrom-Json
+            foreach ($deployment in @($deployments)) {
+                $existing[$deployment.name] = [int]$existing[$deployment.name] + [int]$deployment.capacity
+            }
+        }
+    }
+    $problems = @()
+    $fixes = @()
+    foreach ($usageName in $Required.Keys) {
+        $need = $Required[$usageName]
+        $usage = @($usages | Where-Object { $_.name.value -eq $usageName }) | Select-Object -First 1
+        if (-not $usage) {
+            Write-Warning "No quota information for $($need.Label) in $Location. If deployment fails, choose another -Location."
+            continue
+        }
+        $available = [int]$usage.limit - [int]$usage.currentValue + [int]$existing[$need.Deployment]
+        if ($need.Capacity -gt $available) {
+            $problems += "  - $($need.Label): needs $($need.Capacity)K tokens per minute, but only $([Math]::Max(0, $available))K are available (quota $([int]$usage.limit)K, already in use $([int]$usage.currentValue)K)."
+            if ($available -gt 0) { $fixes += "$($need.Parameter) $available" }
+        }
+    }
+    if ($problems) {
+        $fix = if ($fixes) { "Re-run with lower capacity, for example: .\scripts\deploy_all.ps1 $($fixes -join ' ')`n  Or choose" } else { 'Choose' }
+        throw ("Not enough model quota in $Location for subscription $SubscriptionId. Nothing was deployed.`n" +
+            ($problems -join "`n") + "`n  $fix another region with -Location, or request more quota for the model in the Azure portal.")
+    }
+}

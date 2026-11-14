@@ -74,7 +74,15 @@ start.ps1                 Starts the local app
 
 - Windows with PowerShell 7, Python 3.13+ (tested with 3.14), [uv](https://docs.astral.sh/uv/), and Azure CLI 2.80+.
 - An Azure subscription where you are **Owner** (or **Contributor** plus **User Access Administrator**), because the deployment creates role assignments.
-- Model quota in a region that supports Foundry hosted agents (the default is **East US 2**). The default deployment uses **GPT-5.5 Global Standard: 900K tokens per minute** and **GPT-5.4-mini Global Standard: 200K tokens per minute**. Check your quota on the Foundry portal's quota page, or run `az cognitiveservices usage list --location eastus2 --query "[?contains(name.value,'gpt-5')]" -o table`. If you have less, pass smaller values; see [Deployment options](#deployment-options).
+- Model quota in a region that supports Foundry hosted agents (the default is **East US 2**). The default deployment uses **GPT-5.5 Global Standard: 900K tokens per minute** and **GPT-5.4-mini Global Standard: 200K tokens per minute**. Check your quota on the Foundry portal's quota page, or in PowerShell:
+
+  ```powershell
+  az cognitiveservices usage list --location eastus2 -o json | ConvertFrom-Json |
+    Where-Object { $_.name.value -in 'OpenAI.GlobalStandard.gpt-5.5', 'OpenAI.GlobalStandard.gpt-5.4-mini' } |
+    Select-Object @{ n = 'Model'; e = { $_.name.value } }, currentValue, limit
+  ```
+
+  Available capacity is `limit` minus `currentValue`. If you have less, pass smaller values; see [Deployment options](#deployment-options).
 - **No Docker needed:** the hosted agent's image is built in the cloud with ACR Tasks.
 
 **About Claude:** partner models such as Claude are purchased through Azure Marketplace, and some subscriptions can't buy them. Deployment then retries automatically without Claude, and the Analyst uses GPT-5.4-mini. Pass `-NoClaude` to skip the attempt.
@@ -135,7 +143,29 @@ For example, for a subscription with less quota:
 
 Lower capacity works, but long multi-agent runs are more likely to hit rate limits (HTTP 429). If that happens, wait a minute and run again.
 
+**Quota check:** before creating anything, `provision.ps1` compares the requested capacity with your available quota in the region. If there isn't enough, it stops with a message like this, and nothing is deployed:
+
+```text
+Not enough model quota in eastus2 for subscription <id>. Nothing was deployed.
+  - GPT-5.5 (Global Standard): needs 900K tokens per minute, but only 200K are available (quota 2000K, already in use 1800K).
+  Re-run with lower capacity, for example: .\scripts\deploy_all.ps1 -CoordinatorCapacity 200
+  Or choose another region with -Location, or request more quota for the model in the Azure portal.
+```
+
 Your subscription ID, resource names and agent versions are written only to your local, git-ignored `.env`; nothing is committed.
+
+### Deployment troubleshooting
+
+| Message | What to do |
+|---|---|
+| `Not enough model quota in <region>` | Re-run with the suggested `-CoordinatorCapacity` / `-AnalystCapacity`, another `-Location`, or request more quota. |
+| `InsufficientQuota` from Azure | Same as above. Azure checks quota again during deployment. |
+| `AuthorizationFailed` on `roleAssignments` | You need **Owner**, or **Contributor** plus **User Access Administrator**, on the subscription. |
+| `Subscription … is 'Disabled'` | Re-enable the subscription, or pass another `-SubscriptionId`. |
+| Warning: retrying without Claude | Expected when your subscription can't buy Azure Marketplace models. Use `-NoClaude` to skip the attempt. |
+| `uv` fails with a hardlink error | Set `$env:UV_LINK_MODE="copy"`, delete `.venv` and reinstall (common in OneDrive folders). |
+
+Every script can be re-run safely after fixing the cause.
 
 ## Configuration
 

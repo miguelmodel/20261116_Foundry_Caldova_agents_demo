@@ -36,6 +36,10 @@ try {
     }
     $principalId = Invoke-CaldovaAz -Arguments @('ad', 'signed-in-user', 'show', '--query', 'id', '--output', 'tsv')
     if ([string]::IsNullOrWhiteSpace($principalId)) { throw 'A signed-in user object id is required.' }
+    Assert-CaldovaModelQuota -SubscriptionId $SubscriptionId -Location $Location -ResourceGroup $ResourceGroup -Required @{
+        'OpenAI.GlobalStandard.gpt-5.5' = @{ Capacity = $CoordinatorCapacity; Deployment = 'gpt-55'; Label = 'GPT-5.5 (Global Standard)'; Parameter = '-CoordinatorCapacity' }
+        'OpenAI.GlobalStandard.gpt-5.4-mini' = @{ Capacity = $AnalystCapacity; Deployment = 'gpt-54-mini'; Label = 'GPT-5.4-mini (Global Standard)'; Parameter = '-AnalystCapacity' }
+    }
     $tags = Get-CaldovaTags
     $tagArguments = @($tags.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" })
     $null = Invoke-CaldovaAz -Arguments (@(
@@ -67,15 +71,18 @@ try {
             '--template-file', (Join-Path $CaldovaRoot 'infra\main.bicep'), '--parameters', "@$parameterPath",
             '--query', 'properties.outputs', '--output', 'json'
         )
+        $deploymentHint = 'Foundation deployment failed; see the Azure error above. Common causes: not enough model quota ' +
+            '(re-run with lower -CoordinatorCapacity / -AnalystCapacity, or another -Location), or no permission to create ' +
+            'role assignments (you need Owner, or Contributor plus User Access Administrator).'
         try {
             $outputJson = Invoke-CaldovaAz -Arguments $deploymentArguments
         } catch {
-            if (-not $claudeRequested) { throw }
-            Write-Warning 'Foundation deployment failed with Claude requested. Retrying once without Claude.'
+            if (-not $claudeRequested) { throw $deploymentHint }
+            Write-Warning 'Foundation deployment failed with Claude requested (see the Azure error above). Retrying once without Claude.'
             $claudeRequested = $false
             $parameters.parameters.deployClaude.value = $false
             $parameters | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $parameterPath -Encoding utf8
-            $outputJson = Invoke-CaldovaAz -Arguments $deploymentArguments
+            try { $outputJson = Invoke-CaldovaAz -Arguments $deploymentArguments } catch { throw $deploymentHint }
         }
     } finally {
         Remove-Item -LiteralPath $parameterPath -Force -ErrorAction SilentlyContinue

@@ -12,6 +12,7 @@ $global:CaldovaProvisionTestState = @{
     FailClaude = $false
     Deployments = 0
     Writes = 0
+    Gpt55Used = 0
 }
 
 function az {
@@ -22,9 +23,16 @@ function az {
         'account set' { return }
         'account show' { return 'offline-subscription' }
         'rest --method' {
+            if ($Arguments -match '/usages') {
+                return (@{ value = @(
+                    @{ name = @{ value = 'OpenAI.GlobalStandard.gpt-5.5' }; limit = 1000; currentValue = $state.Gpt55Used }
+                    @{ name = @{ value = 'OpenAI.GlobalStandard.gpt-5.4-mini' }; limit = 1000; currentValue = 0 }
+                ) } | ConvertTo-Json -Depth 5 -Compress)
+            }
             $subscriptionState = if ($state.Disabled) { 'Disabled' } else { 'Enabled' }
             return (@{ state = $subscriptionState; tenantId = 'offline-tenant' } | ConvertTo-Json -Compress)
         }
+        'group exists' { return 'false' }
         'provider show' { return 'Registered' }
         'ad signed-in-user' { return 'offline-user' }
         'group create' {
@@ -92,6 +100,15 @@ try {
     if ($global:CaldovaProvisionTestState.Deployments -ne 1) { throw 'Explicit -NoClaude test failed.' }
     if ($global:CaldovaProvisionTestState.Capacities -ne '300/100') { throw 'Custom model capacities were not passed to Bicep.' }
 
+    $global:CaldovaProvisionTestState.Gpt55Used = 800
+    $global:CaldovaProvisionTestState.Writes = 0
+    $quotaMessage = ''
+    try { & $provision -NoClaude *> $null } catch { $quotaMessage = $_.Exception.Message }
+    if ($quotaMessage -notlike '*Not enough model quota*' -or $quotaMessage -notlike '*-CoordinatorCapacity 200*' -or $global:CaldovaProvisionTestState.Writes -ne 0) {
+        throw "Insufficient quota was not reported clearly before any write: $quotaMessage"
+    }
+    $global:CaldovaProvisionTestState.Gpt55Used = 0
+
     $global:CaldovaProvisionTestState.Disabled = $true
     $global:CaldovaProvisionTestState.Writes = 0
     $rejected = $false
@@ -99,7 +116,7 @@ try {
     if (-not $rejected -or $global:CaldovaProvisionTestState.Writes -ne 0) {
         throw 'Disabled subscription did not stop all provisioning writes.'
     }
-    Write-Host 'PASS: mocked provisioning (Claude, automatic fallback, -NoClaude, model capacities, disabled guard); no Azure calls.'
+    Write-Host 'PASS: mocked provisioning (Claude, automatic fallback, -NoClaude, model capacities, quota check, disabled guard); no Azure calls.'
 } finally {
     Remove-Item -LiteralPath $fixture -Recurse -Force
     Remove-Variable -Name CaldovaProvisionTestState -Scope Global

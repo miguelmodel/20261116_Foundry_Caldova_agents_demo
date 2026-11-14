@@ -65,7 +65,9 @@ failed foundation deployment is retried once without it.
 
 `-CoordinatorCapacity` (default `900`) and `-AnalystCapacity` (default `200`) set the
 GPT-5.5 and GPT-5.4-mini deployment capacity in thousands of tokens per minute. Lower
-them if the subscription has less quota in the target region.
+them if the subscription has less quota in the target region. Before creating anything,
+`provision.ps1` checks the regional quota (counting capacity this demo already holds in
+the target resource group) and stops with the exact parameter values to use if it's short.
 
 If `.env` sets `AZURE_CONFIG_DIR`, every script uses that dedicated Azure CLI profile.
 Live scripts also refuse to run if the active CLI subscription or tenant differs
